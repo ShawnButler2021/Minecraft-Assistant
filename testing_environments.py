@@ -29,33 +29,33 @@ class Inventory:
 		# filtering bad inputs
 		if type(item_data) != type( () ):
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 		elif type(item_data[0]) == str:
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 		elif item_data[1] > 0 or type(item_data[1]) == int:
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 
 		# adding to first free space
 		for y, row in enumerate(self.__inventory):
 			for x, item in enumerate(row):
 				if item == (-1,-1): 
 					self.__inventory[y][x] = item_data
-					return 1
-		return -1
+					return True
+		return False
 
 	def remove_from_inventory(self, item_data):
 		# filtering bad inputs
 		if type(item_data) != type( () ):
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 		elif type(item_data[0]) == str:
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 		elif item_data[1] > 0 or type(item_data[1]) == int:
 			print('Item format: (string, positive integer)')
-			return -1
+			return False
 
 
 		# removing first entry of item
@@ -64,11 +64,18 @@ class Inventory:
 				if item[0] == item_data[0]: 
 					self.__inventory[y][x][1] -= item_data[1]
 					if self.__inventory[y][x][1] < 0: self.__inventory[y][x][1] = 0
-					return 1
-		return -1
+					return True
+		return False
 
 	def search_inventory(self, item_name):
-		pass
+		# removing first entry of item
+		for y, row in enumerate(self.__inventory):
+			for x, item in enumerate(row):
+				if item[0] == item_data[0]: 
+					self.__inventory[y][x][1] -= item_data[1]
+					if self.__inventory[y][x][1] < 0: self.__inventory[y][x][1] = 0
+					return (x,y)
+		return (-1,-1)
 
 	def print_inventory(self, inventory_data):
 		hotbar, inv, armor = inventory_data
@@ -123,6 +130,7 @@ class PlayerStatus:
 # environment series
 class CraftingEnvironment:
 	def __init__(self):
+		self.__inventory = Inventory()
 		self.__crafting_slots = {f'slot{i}': None for i in range(1, 10)}
 		self.__output_slot = None
 		self.__recipes = {
@@ -151,11 +159,18 @@ class CraftingEnvironment:
 	        ('wood', 'wood', 'wood', 'wood', 'wood', 'wood', 'wood', 'wood'): 'chest'
 	    }
 
-	def add_item_to_slot(self, slot, item):
+	def add_item_to_slot(self, slot, item_name):
+		if type(item_name) != str: 
+			print('item_name in add_item_to_slot must be string')
+			return False
+		if slot[:-1] != 'slot':
+			slot = 'slot' + str(slot)
+			
+
 		if slot in self.__crafting_slots and self.__crafting_slots[slot] is None:
-			self.__crafting_slots[slot] = item
-			return f'{item} added to {slot}'
-		return 'Invalid slot or slot already occupied'
+			self.__crafting_slots[slot] = item_name
+			return True
+		return False
 
 	def craft(self):
 		# get the items in the slots and sort to match recipe format
@@ -209,6 +224,15 @@ class PhysicalEnvironment:
 		gold ore block => 5
 		diamond block => 6
 		'''
+		if type(resources) != list:
+			print('resources must be a list')
+			return
+		if type(weights) != list: 
+			print('weights must be a list')
+			return
+		if len(resources) != len(weights):
+			print('weights and resources must be an equal length')
+			return
 
 		self.place_player()
 		for y in range(len(self.environment)-1):
@@ -218,6 +242,7 @@ class PhysicalEnvironment:
 		            resources,
 		            weights=weights
 		        )[0]
+
 
 if __name__ == '__main__':
 	craft_env = CraftingEnvironment()
