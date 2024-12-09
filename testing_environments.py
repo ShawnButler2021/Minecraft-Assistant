@@ -16,7 +16,7 @@ class Inventory:
 		hotbar = []
 		armor = {
 			'helmet': None,
-			'chest': None,
+			'chestplate': None,
 			'leggings': None,
 			'boots': None
 		}
@@ -27,13 +27,13 @@ class Inventory:
 	# inventory change series
 	def add_to_inventory(self, item_data):
 		# filtering bad inputs
-		if type(item_data) != type( () ):
+		if type(item_data) != tuple:
 			print('Item format: (string, positive integer)')
 			return False
 		elif type(item_data[0]) == str:
 			print('Item format: (string, positive integer)')
 			return False
-		elif item_data[1] > 0 or type(item_data[1]) == int:
+		elif item_data[1] < 1 or type(item_data[1]) == int:
 			print('Item format: (string, positive integer)')
 			return False
 
@@ -71,9 +71,7 @@ class Inventory:
 		# removing first entry of item
 		for y, row in enumerate(self.__inventory):
 			for x, item in enumerate(row):
-				if item[0] == item_data[0]: 
-					self.__inventory[y][x][1] -= item_data[1]
-					if self.__inventory[y][x][1] < 0: self.__inventory[y][x][1] = 0
+				if item[0] == item_name: 
 					return (x,y)
 		return (-1,-1)
 
@@ -87,6 +85,10 @@ class Inventory:
 		print('Inventory =>')
 		for row in inv:
 			print('\t',row)
+
+	def get_slot_data(self, coordinates):
+		x, y = coordinates
+		return self.__inventory[y][x]
 
 class PlayerStatus:
 	def __init__(self):
@@ -104,6 +106,16 @@ class PlayerStatus:
 		self.__x += int(x_change)
 		self.__y += int(y_change)
 
+
+	# health series
+	def get_health_level(self):
+		return self.__health
+	def heal(self, health_to_gain):
+		self.__health += health_to_gain
+		if self.__health > 20: self.__health = 20
+	def damage(self, health_to_lose):
+		self.__health -= health_to_lose
+
 	# hunger series
 	def get_hunger_level(self):
 		return self.__hunger
@@ -114,7 +126,7 @@ class PlayerStatus:
 		self.__hunger -= int(abs(hunger_points_to_lose))
 		if self.__hunger > 0: 
 			self.__hunger = 0
-			self.health -= 1
+			self.__health -= 1
 	
 	# armor series
 	def get_armor_rating(self):
