@@ -153,6 +153,8 @@ def train_model(model, inventory, epochs, verbose):
 
 	return model, reward_data
 
+
+
 def policy_iteration(transition_probabilities):
 	states = [
 		'craft',
@@ -182,6 +184,7 @@ def policy_iteration(transition_probabilities):
 			if delta < 1**-6: break
 
 
+
 		policy_stable = True
 		
 		for s in states:
@@ -198,9 +201,9 @@ def policy_iteration(transition_probabilities):
 				])
 				if action_value > best_value:
 					best_value = action_value
-					best_action = a
+					best_action = policy[s]
 
-			policy[s] = best_action
+			policy[s] = a
 			if old_action != best_action:
 				policy_stable = False
 
